@@ -4,152 +4,109 @@
 package rest
 
 import (
+	"fmt"
 	"http"
 	"log"
-	"container/vector"
-	"os"
-	"path"
-	"regexp"
+	"strings"
 )
 
-// Does path match pattern?
-func pathMatch(pattern, path string) bool {
-	if len(pattern) == 0 {
-		// should not happen
-		return false
-	}
-	n := len(pattern)
-	if pattern[n-1] != '/' {
-		return pattern == path
-	}
-	return len(path) >= n && path[0:n] == pattern
+var resources = make (map[string]interface{})
+
+// Lists all the items in the resource
+type Index interface {
+	Index(*http.Conn)
 }
 
-// Return the canonical path for p, eliminating . and .. elements.
-func cleanPath(p string) string {
-	if p == "" {
-		return "/"
-	}
-	if p[0] != '/' {
-		p = "/" + p
-	}
-	np := path.Clean(p)
-	// path.Clean removes trailing slash except for root;
-	// put the trailing slash back if necessary.
-	if p[len(p)-1] == '/' && np != "/" {
-		np += "/"
-	}
-	return np
+// Creates a new resource item
+type Create interface {
+	Create(*http.Conn, map[string]string)
 }
 
-// Is the request method in the accepted methods list? A nil accepted methods list accepts all methods
-func methodMatch(methods []string, requested string) bool {
-	if methods == nil {
-		return true
-	}
-	for _, method := range methods {
-		if method == requested {
-			return true
-		}
-	}
-	return false
+// Views a resource item
+type Find interface {
+	Find(*http.Conn, string)
 }
 
-// Do the headers match every required header?
-func requiredHeadersMatch(requiredHeaders map[string]string, req *http.Request) bool {
-	if requiredHeaders == nil {
-		return true
+type Update interface {
+	Update(*http.Conn, string, map[string]string)
+}
+
+type Delete interface {
+	Delete(*http.Conn, string)
+}
+
+func resourceHandler(c *http.Conn, req *http.Request) {
+	log.Stdoutf("rest.resourceHandler(%#v, %#v)", c, req)
+
+	var resourceEnd = strings.Index(req.URL.Path[1:], "/") + 1
+	var resourceName string
+	if (resourceEnd == -1) {
+		resourceName = req.URL.Path[1:]
+	} else {
+		resourceName = req.URL.Path[1:resourceEnd]
+	}
+	var id = req.URL.Path[resourceEnd+1:]
+
+	resource, ok := resources[resourceName]
+	if !ok {
+		fmt.Fprintf(c, "resource %s not found\n", resourceName)
 	}
 
-	log.Stdoutf("Checking %#v against %#v", requiredHeaders, req)
-
-	for k, v := range requiredHeaders {
-		switch k {
+	if len(id) == 0 {
+		switch req.Method {
+		case "GET":
+			// Index
+			var resIndex, ok = resource.(Index)
+			if ok {
+				resIndex.Index(c)
+			} else {
+				NotImplemented(c)
+			}
+		case "POST":
+			// Create
+			NotImplemented(c)
+		case "OPTIONS":
+			// automatic options listing
+			NotImplemented(c)
 		default:
-			if match, _ := regexp.MatchString(v, req.Header[k]); !match {
-				return false
+			NotImplemented(c)
+		}
+	} else {
+		switch req.Method {
+		case "GET":
+			// Find
+			var resFind, ok = resource.(Find)
+			if ok {
+				resFind.Find(c, id)
+			} else {
+				NotImplemented(c)
 			}
-		case "User-Agent":
-			if match, _ := regexp.MatchString(v, req.UserAgent); !match {
-				return false
-			}
-		case "Host":
-			if match, _ := regexp.MatchString(v, req.Host); !match {
-				return false
-			}
+		case "PUT":
+			// Update
+			NotImplemented(c)
+		case "DELETE":
+			// Delete
+			NotImplemented(c)
+		case "OPTIONS":
+			// automatic options
+			NotImplemented(c)
+		default:
+			NotImplemented(c)
 		}
 	}
-	return true
 }
 
-type RestRoute struct {
-	Pattern         string
-	Methods         []string
-	RequiredHeaders map[string]string
-	Handler         http.Handler
+func Resource(name string, res interface{}) {
+	log.Stdoutf("rest.Resource(%#v, %#v)", name, res)
+
+	resources[name] = res
+	http.Handle("/" + name + "/", http.HandlerFunc(resourceHandler))
 }
 
-type RestMux struct {
-	v *vector.Vector
+func NotFound(c *http.Conn) {
+	http.Error(c, "404 Not Found", 404)
 }
 
-func NewRestMux() *RestMux { return &RestMux{new(vector.Vector)} }
-
-var DefaultRestMux = NewRestMux()
-
-func (mux *RestMux) ServeHTTP(c *http.Conn, req *http.Request) {
-	log.Stdoutf("%s on %s", req.Method, req.URL)
-	// Clean path to canonical form and redirect.
-	if p := cleanPath(req.URL.Path); p != req.URL.Path {
-		c.SetHeader("Location", p)
-		c.WriteHeader(http.StatusMovedPermanently)
-		return
-	}
-
-
-	// Most-specific (longest) pattern wins.
-	var h http.Handler
-	var n = 0
-	for i := 0; i < mux.v.Len(); i++ {
-		var r = mux.v.At(i).(RestRoute)
-		// match path
-		if !pathMatch(r.Pattern, req.URL.Path) {
-			continue
-		} else if !methodMatch(r.Methods, req.Method) {
-			continue
-		} else if !requiredHeadersMatch(r.RequiredHeaders, req) {
-			continue
-		}
-
-		// longest (most specific) pattern wins
-		if h == nil || len(r.Pattern) > n {
-			n = len(r.Pattern)
-			h = r.Handler
-		}
-	}
-	if h == nil {
-		h = http.NotFoundHandler()
-	}
-	h.ServeHTTP(c, req)
-}
-
-func Handle(pattern string, handler http.Handler, methods []string, requiredHeaders map[string]string) {
-	var route RestRoute
-
-	route.Pattern = pattern
-	route.Handler = handler
-	route.Methods = methods
-	route.RequiredHeaders = requiredHeaders
-
-	DefaultRestMux.v.Push(route)
-}
-
-// Wrapper for http.ListenAndServe that replaces DefaultServeMux with
-// DefaultRestMux
-func ListenAndServe(addr string, handler http.Handler) os.Error {
-	if handler == nil {
-		handler = DefaultRestMux
-	}
-	log.Stdoutf("Starting Server on %s", addr)
-	return http.ListenAndServe(addr, handler)
+func NotImplemented(c *http.Conn) {
+	http.Error(c, "501 Not Implemented", 501)
 }

@@ -5,36 +5,57 @@ import (
 	"http"
 	"log"
 	"rest"
+	"strconv"
 )
 
-var Snips = make(map[int]string)
-var NextId = 0
+type SnipsCollection struct {
+	snips map[int]string
+	nextId int
+}
 
-func AddSnip(snip string) int {
-	var id = NextId
-	Snips[id] = snip
-	NextId = NextId + 1
+func NewSnipsCollection() (*SnipsCollection) { return &SnipsCollection{make(map[int]string), 0} }
+
+func (snips *SnipsCollection) add(snip string) int {
+	log.Stdoutf("SnipsCollection.add(%#v)", snip)
+	var id = snips.nextId
+	snips.snips[id] = snip
+	snips.nextId = id + 1
 	return id
 }
 
-func SnipsList(c *http.Conn, req *http.Request) {
-	log.Stdout("SnipsList")
-	c.SetHeader("Content-Type", "text")
-	for k,v := range Snips {
-		fmt.Fprintf(c, "%v: %v\n", k, v)
+func (snips *SnipsCollection) Index(c *http.Conn) {
+	log.Stdout("SnipsCollection.Index(%#v)", c)
+
+	for k,v := range snips.snips {
+		fmt.Fprintf(c, "<a href=\"%v\">%v</a>%v<br/>", k, k, v)
 	}
 }
 
-func Snip(c *http.Conn, req *http.Request) {
-	
+func (snips *SnipsCollection) Find(c *http.Conn, idString string) {
+	log.Stdout("SnipsCollection.Find(%#v, %#v)", c, idString)
+	var id, _ = strconv.Atoi(idString)
+	var snip, ok = snips.snips[id]
+	if ok {
+		fmt.Fprintf(c, "<h1>Snip %v</h1><p>%v</p>", id, snip)
+	} else {
+		rest.NotFound(c)
+		return
+	}
+}
+
+type OtherCollection struct {
+	name string
 }
 
 func main() {
-	AddSnip("test 1")
-	AddSnip("2")
+	var snips = &SnipsCollection{make(map[int]string), 0}
+	var other = &OtherCollection{"other"}
 
-	rest.Handle("/snip/", http.HandlerFunc(SnipsList), []string{"GET"}, nil)
-	rest.Handle("/snip/(.*)", http.HandlerFunc(CreateSnip), []string{"POST"}, nil)
+	snips.add("first post!")
+	snips.add("me too")
 
-	rest.ListenAndServe("127.0.0.1:3000", nil)
+	rest.Resource("snips", snips)
+	rest.Resource("other", other)
+
+	http.ListenAndServe("127.0.0.1:3000", nil)
 }

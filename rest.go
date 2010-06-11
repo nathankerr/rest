@@ -12,29 +12,36 @@ import (
 var resources = make (map[string]interface{})
 
 // Lists all the items in the resource
+// GET /resource/
 type Index interface {
 	Index(*http.Conn)
 }
 
 // Creates a new resource item
+// POST /resource/
 type Create interface {
 	Create(*http.Conn, *http.Request)
 }
 
 // Views a resource item
+// GET /resource/id
 type Find interface {
 	Find(*http.Conn, string)
 }
 
+// PUT /resource/id
 type Update interface {
 	Update(*http.Conn, string, *http.Request)
 }
 
+// DELETE /resource/id
 type Delete interface {
 	Delete(*http.Conn, string)
 }
 
 // Return options to use the service. If string is nil, then it is the base URL
+// OPTIONS /resource/id
+// OPTIONS /resource/
 type Options interface {
 	Options(*http.Conn, string)
 }

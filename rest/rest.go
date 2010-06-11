@@ -6,7 +6,6 @@ package rest
 import (
 	"fmt"
 	"http"
-	"log"
 	"strings"
 )
 
@@ -19,7 +18,7 @@ type Index interface {
 
 // Creates a new resource item
 type Create interface {
-	Create(*http.Conn, map[string]string)
+	Create(*http.Conn, *http.Request)
 }
 
 // Views a resource item
@@ -28,16 +27,19 @@ type Find interface {
 }
 
 type Update interface {
-	Update(*http.Conn, string, map[string]string)
+	Update(*http.Conn, string, *http.Request)
 }
 
 type Delete interface {
 	Delete(*http.Conn, string)
 }
 
-func resourceHandler(c *http.Conn, req *http.Request) {
-	log.Stdoutf("rest.resourceHandler(%#v, %#v)", c, req)
+// Return options to use the service. If string is nil, then it is the base URL
+type Options interface {
+	Options(*http.Conn, string)
+}
 
+func resourceHandler(c *http.Conn, req *http.Request) {
 	var resourceEnd = strings.Index(req.URL.Path[1:], "/") + 1
 	var resourceName string
 	if (resourceEnd == -1) {
@@ -56,18 +58,25 @@ func resourceHandler(c *http.Conn, req *http.Request) {
 		switch req.Method {
 		case "GET":
 			// Index
-			var resIndex, ok = resource.(Index)
-			if ok {
+			if resIndex, ok := resource.(Index); ok {
 				resIndex.Index(c)
 			} else {
 				NotImplemented(c)
 			}
 		case "POST":
 			// Create
-			NotImplemented(c)
+			if resCreate, ok := resource.(Create); ok {
+				resCreate.Create(c, req)
+			} else {
+				NotImplemented(c)
+			}
 		case "OPTIONS":
 			// automatic options listing
-			NotImplemented(c)
+			if resOptions, ok := resource.(Options); ok {
+				resOptions.Options(c, id)
+			} else {
+				NotImplemented(c)
+			}
 		default:
 			NotImplemented(c)
 		}
@@ -75,21 +84,32 @@ func resourceHandler(c *http.Conn, req *http.Request) {
 		switch req.Method {
 		case "GET":
 			// Find
-			var resFind, ok = resource.(Find)
-			if ok {
+			if resFind, ok := resource.(Find); ok {
 				resFind.Find(c, id)
 			} else {
 				NotImplemented(c)
 			}
 		case "PUT":
 			// Update
-			NotImplemented(c)
+			if resUpdate, ok := resource.(Update); ok {
+				resUpdate.Update(c, id, req)
+			} else {
+				NotImplemented(c)
+			}
 		case "DELETE":
 			// Delete
-			NotImplemented(c)
+			if resDelete, ok := resource.(Delete); ok {
+				resDelete.Delete(c, id)
+			} else {
+				NotImplemented(c)
+			}
 		case "OPTIONS":
 			// automatic options
-			NotImplemented(c)
+			if resOptions, ok := resource.(Options); ok {
+				resOptions.Options(c, id)
+			} else {
+				NotImplemented(c)
+			}
 		default:
 			NotImplemented(c)
 		}
@@ -97,8 +117,6 @@ func resourceHandler(c *http.Conn, req *http.Request) {
 }
 
 func Resource(name string, res interface{}) {
-	log.Stdoutf("rest.Resource(%#v, %#v)", name, res)
-
 	resources[name] = res
 	http.Handle("/" + name + "/", http.HandlerFunc(resourceHandler))
 }

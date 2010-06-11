@@ -24,38 +24,36 @@ func (snips *SnipsCollection) add(snip string) int {
 }
 
 func (snips *SnipsCollection) Index(c *http.Conn) {
-	log.Stdout("SnipsCollection.Index(%#v)", c)
-
 	for k,v := range snips.snips {
 		fmt.Fprintf(c, "<a href=\"%v\">%v</a>%v<br/>", k, k, v)
 	}
 }
 
 func (snips *SnipsCollection) Find(c *http.Conn, idString string) {
-	log.Stdout("SnipsCollection.Find(%#v, %#v)", c, idString)
-	var id, _ = strconv.Atoi(idString)
-	var snip, ok = snips.snips[id]
-	if ok {
-		fmt.Fprintf(c, "<h1>Snip %v</h1><p>%v</p>", id, snip)
-	} else {
+	id, err := strconv.Atoi(idString)
+	if err != nil {
 		rest.NotFound(c)
 		return
 	}
-}
 
-type OtherCollection struct {
-	name string
+	snip, ok := snips.snips[id]
+	if !ok {
+		rest.NotFound(c)
+		return
+	}
+
+
+	fmt.Fprintf(c, "<h1>Snip %v</h1><p>%v</p>", id, snip)
 }
 
 func main() {
-	var snips = &SnipsCollection{make(map[int]string), 0}
-	var other = &OtherCollection{"other"}
+	address := "127.0.0.1:3000"
+	snips := NewSnipsCollection()
 
 	snips.add("first post!")
 	snips.add("me too")
 
 	rest.Resource("snips", snips)
-	rest.Resource("other", other)
 
-	http.ListenAndServe("127.0.0.1:3000", nil)
+	http.ListenAndServe(address, nil)
 }

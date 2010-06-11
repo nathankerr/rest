@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"http"
 	"log"
-	"rest"
+	"github.com/nathankerr/rest.go"
 	"strconv"
 )
 

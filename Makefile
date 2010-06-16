@@ -8,7 +8,8 @@ TARG=rest
 GOFMT=gofmt
 
 GOFILES=\
-	rest.go\
+	server.go\
+	client.go\
 
 include $(GOROOT)/src/Make.pkg
 

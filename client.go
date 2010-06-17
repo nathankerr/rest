@@ -1,7 +1,9 @@
 package rest
 
 import (
+	"bytes"
 	"http"
+	"io"
 	"net"
 	"os"
 )
@@ -34,6 +36,8 @@ func NewClient(resource string) (*Client, os.Error) {
 func (client *Client) newRequest(method string, id string) (*http.Request, os.Error) {
 	request := new(http.Request)
 	var err os.Error
+
+	request.Method = method
 
 	url := client.resource.String() + id
 	if request.URL, err = http.ParseURL(url); err != nil {
@@ -78,6 +82,28 @@ func (client *Client) Find(id string) (*http.Response, os.Error) {
 	if request, err = client.newRequest("GET", id); err != nil {
 		return nil, err
 	}
+
+	return client.Request(request)
+}
+
+
+type nopCloser struct {
+	io.Reader
+}
+func (nopCloser) Close() os.Error {
+	return nil
+}
+
+// POST /resource/id
+func (client *Client) Create(body string) (*http.Response, os.Error) {
+	var request *http.Request
+	var err os.Error
+
+	if request, err = client.newRequest("POST", ""); err != nil {
+		return nil, err
+	}
+
+	request.Body = nopCloser{bytes.NewBufferString(body)}
 
 	return client.Request(request)
 }

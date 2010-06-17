@@ -45,7 +45,7 @@ func client() {
 	}
 
 	var response *http.Response
-	if response, err = snips.Find("1"); err != nil {
+	if response, err = snips.Create("newone"); err != nil {
 		log.Exit(err)
 	}
 
@@ -55,4 +55,5 @@ func client() {
 	}
 
 	fmt.Printf("%v\n", string(data))
+
 }

@@ -8,8 +8,8 @@ import (
 )
 
 func (snips *SnipsCollection) Index(c *http.Conn) {
-	for k,v := range snips.snips {
-		fmt.Fprintf(c, "<a href=\"%v\">%v</a>%v<br/>", k, k, v)
+	for _,snip := range snips.All() {
+		fmt.Fprintf(c, "<a href=\"%v\">%v</a>%v<br/>", snip.Id, snip.Id, snip.Body)
 	}
 }
 
@@ -20,12 +20,12 @@ func (snips *SnipsCollection) Find(c *http.Conn, idString string) {
 		return
 	}
 
-	snip, ok := snips.snips[id]
+	snip, ok := snips.WithId(id)
 	if !ok {
 		rest.NotFound(c)
 		return
 	}
 
 
-	fmt.Fprintf(c, "<h1>Snip %v</h1><p>%v</p>", id, snip)
+	fmt.Fprintf(c, "<h1>Snip %v</h1><p>%v</p>", snip.Id, snip.Body)
 }

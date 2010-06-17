@@ -23,6 +23,7 @@ func main() {
 }
 
 func serve() {
+	log.Stdout("Starting Server")
 	address := "127.0.0.1:3000"
 	snips := NewSnipsCollection()
 
@@ -35,6 +36,7 @@ func serve() {
 }
 
 func client() {
+	log.Stdout("Starting Client")
 	var snips *rest.Client
 	var err os.Error
 
@@ -43,7 +45,7 @@ func client() {
 	}
 
 	var response *http.Response
-	if response, err = snips.Index(); err != nil {
+	if response, err = snips.Find("1"); err != nil {
 		log.Exit(err)
 	}
 

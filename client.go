@@ -31,22 +31,53 @@ func NewClient(resource string) (*Client, os.Error) {
 	return client, nil
 }
 
-// GET /resource/
-func (client *Client) Index() (*http.Response, os.Error) {
-	var request *http.Request
-	var response *http.Response
+func (client *Client) newRequest(method string, id string) (*http.Request, os.Error) {
+	request := new(http.Request)
 	var err os.Error
 
-	request = new(http.Request)
-	request.URL = client.resource
-	request.Method = "GET"
+	url := client.resource.String() + id
+	if request.URL, err = http.ParseURL(url); err != nil {
+		return nil, err
+	}
+
+	return request, nil
+}
+
+func (client *Client) Request(request *http.Request) (*http.Response, os.Error) {
+	var err os.Error
+	var response *http.Response
 
 	if err = client.conn.Write(request); err != nil {
 		return nil, err
 	}
+
 	if response, err = client.conn.Read(); err != nil {
 		return nil, err
 	}
 
 	return response, nil
+}
+
+// GET /resource/
+func (client *Client) Index() (*http.Response, os.Error) {
+	var request *http.Request
+	var err os.Error
+
+	if request, err = client.newRequest("GET", ""); err != nil {
+		return nil, err
+	}
+
+	return client.Request(request)
+}
+
+// GET /resource/id
+func (client *Client) Find(id string) (*http.Response, os.Error) {
+	var request *http.Request
+	var err os.Error
+
+	if request, err = client.newRequest("GET", id); err != nil {
+		return nil, err
+	}
+
+	return client.Request(request)
 }

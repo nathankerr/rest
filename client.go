@@ -134,3 +134,13 @@ func (client *Client) IdFromURL(urlString string) (string, os.Error) {
 
 	return string(url.Path[len(client.resource.Path):]), nil
 }
+
+func (client *Client) Delete(id string) (*http.Response, os.Error) {
+	var request *http.Request
+	var err os.Error
+	if request, err = client.newRequest("DELETE", id); err != nil {
+		return nil, err
+	}
+
+	return client.Request(request)
+}

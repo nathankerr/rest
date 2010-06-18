@@ -75,4 +75,9 @@ func client() {
 
 	fmt.Printf("%v\n", string(data))
 
+	// Delete the created snip
+	if response, err = snips.Delete(id); err != nil {
+		log.Exit(err)
+	}
+
 }

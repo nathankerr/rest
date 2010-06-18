@@ -68,3 +68,14 @@ func (snips *SnipsCollection) Update(c *http.Conn, idString string, request *htt
 	snip.Body = string(data)
 	rest.Updated(c, request.URL.String())
 }
+
+func (snips *SnipsCollection) Delete(c *http.Conn, idString string) {
+	var id int
+	var err os.Error
+	if id, err = strconv.Atoi(idString); err != nil {
+		rest.NotFound(c)
+	}
+
+	snips.Remove(id)
+	rest.NoContent(c)
+}

@@ -63,3 +63,14 @@ func (snips *SnipsCollection) All() []*Snip {
 
 	return all
 }
+
+func (snips *SnipsCollection) Remove(id int) {
+	length := snips.v.Len()
+	for i := 0; i < length; i++ {
+		snip := snips.v.At(i).(*Snip)
+		if snip.Id == id {
+			snips.v.Delete(i)
+			return
+		}
+	}
+}

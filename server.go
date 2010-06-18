@@ -150,3 +150,7 @@ func BadRequest(c *http.Conn, instructions string) {
 	c.WriteHeader(http.StatusBadRequest)
 	c.Write([]byte(instructions))
 }
+
+func NoContent(c *http.Conn) {
+	http.Error(c, "204 No Content", http.StatusNoContent)
+}

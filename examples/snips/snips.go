@@ -32,7 +32,9 @@ func serve() {
 
 	rest.Resource("snips", snips)
 
-	http.ListenAndServe(address, nil)
+	if err := http.ListenAndServe(address, nil); err != nil {
+		log.Exit(err)
+	}
 }
 
 func client() {

@@ -135,3 +135,8 @@ func NotFound(c *http.Conn) {
 func NotImplemented(c *http.Conn) {
 	http.Error(c, "501 Not Implemented", 501)
 }
+
+func Created(c *http.Conn, location string) {
+	c.SetHeader("Location", location)
+	http.Error(c, "201 Created", 201)
+}

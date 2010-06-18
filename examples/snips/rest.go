@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"http"
+	"io/ioutil"
+	"log"
 	"github.com/nathankerr/rest.go"
 	"strconv"
 )
@@ -28,4 +30,14 @@ func (snips *SnipsCollection) Find(c *http.Conn, idString string) {
 
 
 	fmt.Fprintf(c, "<h1>Snip %v</h1><p>%v</p>", snip.Id, snip.Body)
+}
+
+func (snips *SnipsCollection) Create(c *http.Conn, request *http.Request) {
+	data, err := ioutil.ReadAll(request.Body)
+	if err != nil {
+		log.Exit(err)
+	}
+
+	id := snips.Add(string(data))
+	rest.Created(c, fmt.Sprintf("%v%v", request.URL.String(), id))
 }

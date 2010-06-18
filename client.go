@@ -37,6 +37,10 @@ func (client *Client) newRequest(method string, id string) (*http.Request, os.Er
 	request := new(http.Request)
 	var err os.Error
 
+	request.ProtoMajor = 1
+	request.ProtoMinor = 1
+	request.TransferEncoding = []string{"chunked"}
+
 	request.Method = method
 
 	url := client.resource.String() + id

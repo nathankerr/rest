@@ -98,7 +98,7 @@ func (nopCloser) Close() os.Error {
 	return nil
 }
 
-// POST /resource/id
+// POST /resource
 func (client *Client) Create(body string) (*http.Response, os.Error) {
 	var request *http.Request
 	var err os.Error
@@ -110,4 +110,27 @@ func (client *Client) Create(body string) (*http.Response, os.Error) {
 	request.Body = nopCloser{bytes.NewBufferString(body)}
 
 	return client.Request(request)
+}
+
+// PUT /resource/id
+func (client *Client) Update(id string, body string) (*http.Response, os.Error) {
+	var request *http.Request
+	var err os.Error
+	if request, err = client.newRequest("PUT", id); err != nil {
+		return nil, err
+	}
+
+	request.Body = nopCloser{bytes.NewBufferString(body)}
+
+	return client.Request(request)
+}
+
+func (client *Client) IdFromURL(urlString string) (string, os.Error) {
+	var url *http.URL
+	var err os.Error
+	if url, err = http.ParseURL(urlString); err != nil {
+		return "", err
+	}
+
+	return string(url.Path[len(client.resource.Path):]), nil
 }

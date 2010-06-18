@@ -129,14 +129,24 @@ func Resource(name string, res interface{}) {
 }
 
 func NotFound(c *http.Conn) {
-	http.Error(c, "404 Not Found", 404)
+	http.Error(c, "404 Not Found", http.StatusNotFound)
 }
 
 func NotImplemented(c *http.Conn) {
-	http.Error(c, "501 Not Implemented", 501)
+	http.Error(c, "501 Not Implemented", http.StatusNotImplemented)
 }
 
 func Created(c *http.Conn, location string) {
 	c.SetHeader("Location", location)
-	http.Error(c, "201 Created", 201)
+	http.Error(c, "201 Created", http.StatusCreated)
+}
+
+func Updated(c *http.Conn, location string) {
+	c.SetHeader("Location", location)
+	http.Error(c, "200 OK", http.StatusOK)
+}
+
+func BadRequest(c *http.Conn, instructions string) {
+	c.WriteHeader(http.StatusBadRequest)
+	c.Write([]byte(instructions))
 }

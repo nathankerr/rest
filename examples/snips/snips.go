@@ -46,8 +46,25 @@ func client() {
 		log.Exit(err)
 	}
 
+	// Create a new snip
 	var response *http.Response
 	if response, err = snips.Create("newone"); err != nil {
+		log.Exit(err)
+	}
+
+	var id string
+	if id, err = snips.IdFromURL(response.Header["Location"]); err != nil {
+		log.Exit(err)
+	}
+
+	// Update the snip
+	if response, err = snips.Update(id, "updated"); err != nil {
+		log.Exit(err)
+	}
+
+
+	// Get the updated snip
+	if response, err = snips.Find(id); err != nil {
 		log.Exit(err)
 	}
 

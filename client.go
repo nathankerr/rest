@@ -33,6 +33,10 @@ func NewClient(resource string) (*Client, os.Error) {
 	return client, nil
 }
 
+func (client *Client) Close() {
+	client.conn.Close()
+}
+
 func (client *Client) newRequest(method string, id string) (*http.Request, os.Error) {
 	request := new(http.Request)
 	var err os.Error

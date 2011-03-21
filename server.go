@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-var resources = make (map[string]interface{})
+var resources = make(map[string]interface{})
 
 // Lists all the items in the resource
 // GET /resource/
@@ -49,7 +49,7 @@ type Options interface {
 func resourceHandler(c http.ResponseWriter, req *http.Request) {
 	var resourceEnd = strings.Index(req.URL.Path[1:], "/") + 1
 	var resourceName string
-	if (resourceEnd == -1) {
+	if resourceEnd == -1 {
 		resourceName = req.URL.Path[1:]
 	} else {
 		resourceName = req.URL.Path[1:resourceEnd]
@@ -125,7 +125,7 @@ func resourceHandler(c http.ResponseWriter, req *http.Request) {
 
 func Resource(name string, res interface{}) {
 	resources[name] = res
-	http.Handle("/" + name + "/", http.HandlerFunc(resourceHandler))
+	http.Handle("/"+name+"/", http.HandlerFunc(resourceHandler))
 }
 
 func NotFound(c http.ResponseWriter) {
@@ -137,12 +137,12 @@ func NotImplemented(c http.ResponseWriter) {
 }
 
 func Created(c http.ResponseWriter, location string) {
-	c.SetHeader("Location", location)
+	c.Header().Set("Location", location)
 	http.Error(c, "201 Created", http.StatusCreated)
 }
 
 func Updated(c http.ResponseWriter, location string) {
-	c.SetHeader("Location", location)
+	c.Header().Set("Location", location)
 	http.Error(c, "200 OK", http.StatusOK)
 }
 

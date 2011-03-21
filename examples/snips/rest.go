@@ -11,13 +11,13 @@ import (
 
 var formatting = "formatting instructions go here"
 
-func (snips *SnipsCollection) Index(c *http.Conn) {
+func (snips *SnipsCollection) Index(c http.ResponseWriter) {
 	for _,snip := range snips.All() {
 		fmt.Fprintf(c, "<a href=\"%v\">%v</a>%v<br/>", snip.Id, snip.Id, snip.Body)
 	}
 }
 
-func (snips *SnipsCollection) Find(c *http.Conn, idString string) {
+func (snips *SnipsCollection) Find(c http.ResponseWriter, idString string) {
 	id, err := strconv.Atoi(idString)
 	if err != nil {
 		rest.NotFound(c)
@@ -34,7 +34,7 @@ func (snips *SnipsCollection) Find(c *http.Conn, idString string) {
 	fmt.Fprintf(c, "<h1>Snip %v</h1><p>%v</p>", snip.Id, snip.Body)
 }
 
-func (snips *SnipsCollection) Create(c *http.Conn, request *http.Request) {
+func (snips *SnipsCollection) Create(c http.ResponseWriter, request *http.Request) {
 	data, err := ioutil.ReadAll(request.Body)
 	if err != nil {
 		rest.BadRequest(c, formatting)
@@ -45,7 +45,7 @@ func (snips *SnipsCollection) Create(c *http.Conn, request *http.Request) {
 	rest.Created(c, fmt.Sprintf("%v%v", request.URL.String(), id))
 }
 
-func (snips *SnipsCollection) Update(c *http.Conn, idString string, request *http.Request) {
+func (snips *SnipsCollection) Update(c http.ResponseWriter, idString string, request *http.Request) {
 	var id int
 	var err os.Error
 	if id, err = strconv.Atoi(idString); err != nil {
@@ -69,7 +69,7 @@ func (snips *SnipsCollection) Update(c *http.Conn, idString string, request *htt
 	rest.Updated(c, request.URL.String())
 }
 
-func (snips *SnipsCollection) Delete(c *http.Conn, idString string) {
+func (snips *SnipsCollection) Delete(c http.ResponseWriter, idString string) {
 	var id int
 	var err os.Error
 	if id, err = strconv.Atoi(idString); err != nil {

@@ -9,7 +9,7 @@ import (
 )
 
 type Client struct {
-	conn *http.ClientConn
+	conn     *http.ClientConn
 	resource *http.URL
 }
 
@@ -63,7 +63,7 @@ func (client *Client) Request(request *http.Request) (*http.Response, os.Error) 
 		return nil, err
 	}
 
-	if response, err = client.conn.Read(); err != nil {
+	if response, err = client.conn.Read(request); err != nil {
 		return nil, err
 	}
 
@@ -98,6 +98,7 @@ func (client *Client) Find(id string) (*http.Response, os.Error) {
 type nopCloser struct {
 	io.Reader
 }
+
 func (nopCloser) Close() os.Error {
 	return nil
 }

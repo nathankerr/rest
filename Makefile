@@ -14,4 +14,5 @@ GOFILES=\
 include $(GOROOT)/src/Make.pkg
 
 format:
-	${GOFMT} -w rest.go
+	${GOFMT} -w server.go
+	${GOFMT} -w client.go

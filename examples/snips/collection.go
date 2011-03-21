@@ -12,7 +12,7 @@ type Snip struct {
 }
 
 func NewSnip(id int, body string) *Snip {
-	log.Stdout("Creating new Snip:", id, body)
+	log.Println("Creating new Snip:", id, body)
 	return &Snip{id, body}
 }
 
@@ -23,12 +23,12 @@ type SnipsCollection struct {
 }
 
 func NewSnipsCollection() (*SnipsCollection) {
-	log.Stdout("Creating new SnipsCollection")
+	log.Println("Creating new SnipsCollection")
 	return &SnipsCollection{new(vector.Vector), 0}
 }
 
 func (snips *SnipsCollection) Add(body string) int {
-	log.Stdout("Adding Snip:", body)
+	log.Println("Adding Snip:", body)
 	id := snips.nextId
 	snips.nextId++
 
@@ -39,8 +39,8 @@ func (snips *SnipsCollection) Add(body string) int {
 }
 
 func (snips *SnipsCollection) WithId(id int) (*Snip, bool) {
-	log.Stdout("Finding Snip with id: ", id)
-	all := snips.v.Data()
+	log.Println("Finding Snip with id: ", id)
+	all := *snips.v
 	for _, v := range all {
 		snip, ok := v.(*Snip)
 		if ok && snip.Id == id {
@@ -51,8 +51,8 @@ func (snips *SnipsCollection) WithId(id int) (*Snip, bool) {
 }
 
 func (snips *SnipsCollection) All() []*Snip {
-	log.Stdout("Finding all Snips")
-	data := snips.v.Data()
+	log.Println("Finding all Snips")
+	data := *snips.v
 	all := make([]*Snip, len(data))
 
 	for k, v := range data {

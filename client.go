@@ -25,7 +25,7 @@ func NewClient(resource string) (*Client, os.Error) {
 
 	// Setup conn
 	var tcpConn net.Conn
-	if tcpConn, err = net.Dial("tcp", "", client.resource.Host); err != nil {
+	if tcpConn, err = net.Dial("tcp", client.resource.Host); err != nil {
 		return nil, err
 	}
 	client.conn = http.NewClientConn(tcpConn, nil)

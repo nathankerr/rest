@@ -15,14 +15,17 @@ import (
 	"strconv"
 )
 
+// String used as error message on invalid formatting (request body could not be parsed into a snip)
 var formatting = "formatting instructions go here"
 
+// Get an index of the snips in the collection
 func (snips *SnipsCollection) Index(c http.ResponseWriter) {
 	for _,snip := range snips.All() {
 		fmt.Fprintf(c, "<a href=\"%v\">%v</a>%v<br/>", snip.Id, snip.Id, snip.Body)
 	}
 }
 
+// Find a snip from the collection, identified by the ID
 func (snips *SnipsCollection) Find(c http.ResponseWriter, idString string) {
 	id, err := strconv.Atoi(idString)
 	if err != nil {
@@ -36,10 +39,10 @@ func (snips *SnipsCollection) Find(c http.ResponseWriter, idString string) {
 		return
 	}
 
-
 	fmt.Fprintf(c, "<h1>Snip %v</h1><p>%v</p>", snip.Id, snip.Body)
 }
 
+// Create and add a new snip to the collection
 func (snips *SnipsCollection) Create(c http.ResponseWriter, request *http.Request) {
 	data, err := ioutil.ReadAll(request.Body)
 	if err != nil {
@@ -84,6 +87,7 @@ func (snips *SnipsCollection) Update(c http.ResponseWriter, idString string, req
 	rest.Updated(c, request.URL.String())
 }
 
+// Delete a snip identified by ID from the collection
 func (snips *SnipsCollection) Delete(c http.ResponseWriter, idString string) {
 	var id int
 	var err os.Error

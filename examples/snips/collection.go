@@ -1,3 +1,7 @@
+/*
+	Defines SnipsCollection struct-type and NewSnipsCollection()
+	SnipsCollection has methods Add, WithId, All and Remove.
+*/
 package main
 
 import (

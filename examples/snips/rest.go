@@ -1,3 +1,7 @@
+/*
+	Defines Index, Find, Create, Update and Delete methods for SnipsCollection
+	These will be called on REST requests on the SnipsCollection object
+*/
 package main
 
 import (
@@ -45,27 +49,36 @@ func (snips *SnipsCollection) Create(c http.ResponseWriter, request *http.Reques
 	rest.Created(c, fmt.Sprintf("%v%v", request.URL.String(), id))
 }
 
+// Update a snip identified by an ID with the data sent as request-body
 func (snips *SnipsCollection) Update(c http.ResponseWriter, idString string, request *http.Request) {
+	// Parse ID of type string to int
 	var id int
 	var err os.Error
 	if id, err = strconv.Atoi(idString); err != nil {
+		// The ID could not be converted from string to int
 		rest.NotFound(c)
 		return
 	}
 
+	// Find the snip with the ID
 	var snip *Snip
 	var ok bool
 	if snip, ok = snips.WithId(id); !ok {
+		// A snip with the passed ID could not be found in our collection
 		rest.NotFound(c)
 	}
 
+	// Get the request-body for data to update the snipped to
 	var data []byte
 	if data, err = ioutil.ReadAll(request.Body); err != nil {
+		// The request body could not be read, thus it was a bad request
 		rest.BadRequest(c, formatting)
 		return
 	}
 
+	// Set the snips body
 	snip.Body = string(data)
+	// Respond to indicate successful update
 	rest.Updated(c, request.URL.String())
 }
 

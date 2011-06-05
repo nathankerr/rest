@@ -33,10 +33,12 @@ func NewClient(resource string) (*Client, os.Error) {
 	return client, nil
 }
 
+// Close the clients connection
 func (client *Client) Close() {
 	client.conn.Close()
 }
 
+// General Request method used by the specialized request methods to create a request
 func (client *Client) newRequest(method string, id string) (*http.Request, os.Error) {
 	request := new(http.Request)
 	var err os.Error
@@ -47,6 +49,7 @@ func (client *Client) newRequest(method string, id string) (*http.Request, os.Er
 
 	request.Method = method
 
+	// Generate Resource-URI and parse it
 	url := client.resource.String() + id
 	if request.URL, err = http.ParseURL(url); err != nil {
 		return nil, err
@@ -55,14 +58,17 @@ func (client *Client) newRequest(method string, id string) (*http.Request, os.Er
 	return request, nil
 }
 
+// Send a request
 func (client *Client) Request(request *http.Request) (*http.Response, os.Error) {
 	var err os.Error
 	var response *http.Response
 
+	// Send the request
 	if err = client.conn.Write(request); err != nil {
 		return nil, err
 	}
 
+	// Read the response
 	if response, err = client.conn.Read(request); err != nil {
 		return nil, err
 	}
@@ -130,6 +136,7 @@ func (client *Client) Update(id string, body string) (*http.Response, os.Error) 
 	return client.Request(request)
 }
 
+// Parse a response-Location-URI to get the ID of the worked-on snip
 func (client *Client) IdFromURL(urlString string) (string, os.Error) {
 	var url *http.URL
 	var err os.Error
@@ -140,6 +147,7 @@ func (client *Client) IdFromURL(urlString string) (string, os.Error) {
 	return string(url.Path[len(client.resource.Path):]), nil
 }
 
+// DELETE /resource/id
 func (client *Client) Delete(id string) (*http.Response, os.Error) {
 	var request *http.Request
 	var err os.Error

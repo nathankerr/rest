@@ -1,3 +1,6 @@
+/*
+	Example REST server and client.
+*/
 package main
 
 import (
@@ -51,17 +54,19 @@ func client() {
 	if response, err = snips.Create("newone"); err != nil {
 		log.Fatalln(err)
 	}
-
+	log.Println("Sent create request for 'newone'")
+	// Get the ID for the just created snip by checking the response Location.
 	var id string
 	if id, err = snips.IdFromURL(response.Header.Get("Location")); err != nil {
 		log.Fatalln(err)
 	}
+	log.Println("'newone' has been added with id ", id)
 
 	// Update the snip
 	if response, err = snips.Update(id, "updated"); err != nil {
 		log.Fatalln(err)
 	}
-
+	log.Println("Sent snip-update request")
 
 	// Get the updated snip
 	if response, err = snips.Find(id); err != nil {
@@ -73,11 +78,13 @@ func client() {
 		log.Fatalln(err)
 	}
 
+	fmt.Println("Added and updated snip has been requested. Result:")
 	fmt.Printf("%v\n", string(data))
 
 	// Delete the created snip
 	if response, err = snips.Delete(id); err != nil {
 		log.Fatalln(err)
 	}
+	log.Println("Delete request has been sent")
 
 }

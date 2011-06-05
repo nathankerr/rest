@@ -1,6 +1,6 @@
 /*
 	Defines Index, Find, Create, Update and Delete methods for SnipsCollection
-	These will be called on REST requests on the SnipsCollection object
+	These will be called on the corresponding REST requests
 */
 package main
 
@@ -10,6 +10,8 @@ import (
 	"io/ioutil"
 	"os"
 	"github.com/nathankerr/rest.go"
+//	"github.com/jessta/rest.go"
+//	"github.com/Kissaki/rest.go"
 	"strconv"
 )
 

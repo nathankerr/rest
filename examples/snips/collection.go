@@ -1,6 +1,7 @@
 /*
 	Defines SnipsCollection struct-type and NewSnipsCollection()
-	SnipsCollection has methods Add, WithId, All and Remove.
+	It is used by the example REST server for storing and managing snips
+	It has the methods Add, WithId, All and Remove.
 */
 package main
 

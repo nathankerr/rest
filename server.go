@@ -1,6 +1,17 @@
-// Wraps the http package with a HTTP method and header aware muxer.
-// Code derived from the http package implementation of DefaultServeMux.
-
+/*
+	Wraps the http package with a HTTP method and header aware muxer.
+	Code derived from the http package implementation of DefaultServeMux.
+	
+	A resource may provide the following methods:
+		* Index(http.ResponseWriter)
+		* Create(http.ResponseWriter, *http.Request)
+		* Options(http.ResponseWriter, id string)
+		* Find(http.ResponseWriter, id string)
+		* Update(http.ResponseWriter, id string, *http.Request)
+		* Delete(http.ResponseWriter, id string)
+	
+	TODO: According to Golang naming convention, 1-method-interfaces should be named differently: Indexer, Creator, etc.
+*/
 package rest
 
 import (
@@ -46,7 +57,9 @@ type Options interface {
 	Options(http.ResponseWriter, string)
 }
 
+// Generic resource handler
 func resourceHandler(c http.ResponseWriter, req *http.Request) {
+	// Parse request URI to resource URI and (potential) ID
 	var resourceEnd = strings.Index(req.URL.Path[1:], "/") + 1
 	var resourceName string
 	if resourceEnd == -1 {
@@ -87,7 +100,7 @@ func resourceHandler(c http.ResponseWriter, req *http.Request) {
 		default:
 			NotImplemented(c)
 		}
-	} else {
+	} else { // ID was passed
 		switch req.Method {
 		case "GET":
 			// Find

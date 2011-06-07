@@ -10,36 +10,36 @@ var resources = make(map[string]interface{})
 
 // Lists all the items in the resource
 // GET /resource/
-type Index interface {
+type index interface {
 	Index(http.ResponseWriter)
 }
 
 // Creates a new resource item
 // POST /resource/
-type Create interface {
+type create interface {
 	Create(http.ResponseWriter, *http.Request)
 }
 
 // Views a resource item
 // GET /resource/id
-type Find interface {
+type find interface {
 	Find(http.ResponseWriter, string)
 }
 
 // PUT /resource/id
-type Update interface {
+type update interface {
 	Update(http.ResponseWriter, string, *http.Request)
 }
 
 // DELETE /resource/id
-type Delete interface {
+type delete interface {
 	Delete(http.ResponseWriter, string)
 }
 
 // Return options to use the service. If string is nil, then it is the base URL
 // OPTIONS /resource/id
 // OPTIONS /resource/
-type Options interface {
+type options interface {
 	Options(http.ResponseWriter, string)
 }
 
@@ -64,21 +64,21 @@ func resourceHandler(c http.ResponseWriter, req *http.Request) {
 		switch req.Method {
 		case "GET":
 			// Index
-			if resIndex, ok := resource.(Index); ok {
+			if resIndex, ok := resource.(index); ok {
 				resIndex.Index(c)
 			} else {
 				NotImplemented(c)
 			}
 		case "POST":
 			// Create
-			if resCreate, ok := resource.(Create); ok {
+			if resCreate, ok := resource.(create); ok {
 				resCreate.Create(c, req)
 			} else {
 				NotImplemented(c)
 			}
 		case "OPTIONS":
 			// automatic options listing
-			if resOptions, ok := resource.(Options); ok {
+			if resOptions, ok := resource.(options); ok {
 				resOptions.Options(c, id)
 			} else {
 				NotImplemented(c)
@@ -90,28 +90,28 @@ func resourceHandler(c http.ResponseWriter, req *http.Request) {
 		switch req.Method {
 		case "GET":
 			// Find
-			if resFind, ok := resource.(Find); ok {
+			if resFind, ok := resource.(find); ok {
 				resFind.Find(c, id)
 			} else {
 				NotImplemented(c)
 			}
 		case "PUT":
 			// Update
-			if resUpdate, ok := resource.(Update); ok {
+			if resUpdate, ok := resource.(update); ok {
 				resUpdate.Update(c, id, req)
 			} else {
 				NotImplemented(c)
 			}
 		case "DELETE":
 			// Delete
-			if resDelete, ok := resource.(Delete); ok {
+			if resDelete, ok := resource.(delete); ok {
 				resDelete.Delete(c, id)
 			} else {
 				NotImplemented(c)
 			}
 		case "OPTIONS":
 			// automatic options
-			if resOptions, ok := resource.(Options); ok {
+			if resOptions, ok := resource.(options); ok {
 				resOptions.Options(c, id)
 			} else {
 				NotImplemented(c)

@@ -1,17 +1,3 @@
-/*
-	Wraps the http package with a HTTP method and header aware muxer.
-	Code derived from the http package implementation of DefaultServeMux.
-	
-	A resource may provide the following methods:
-		* Index(http.ResponseWriter)
-		* Create(http.ResponseWriter, *http.Request)
-		* Options(http.ResponseWriter, id string)
-		* Find(http.ResponseWriter, id string)
-		* Update(http.ResponseWriter, id string, *http.Request)
-		* Delete(http.ResponseWriter, id string)
-	
-	TODO: According to Golang naming convention, 1-method-interfaces should be named differently: Indexer, Creator, etc.
-*/
 package rest
 
 import (
@@ -136,34 +122,41 @@ func resourceHandler(c http.ResponseWriter, req *http.Request) {
 	}
 }
 
+// Add a resource route to http
 func Resource(name string, res interface{}) {
 	resources[name] = res
 	http.Handle("/"+name+"/", http.HandlerFunc(resourceHandler))
 }
 
+// Emits a 404 Not Found
 func NotFound(c http.ResponseWriter) {
 	http.Error(c, "404 Not Found", http.StatusNotFound)
 }
 
+// Emits a 501 Not Implemented
 func NotImplemented(c http.ResponseWriter) {
 	http.Error(c, "501 Not Implemented", http.StatusNotImplemented)
 }
 
+// Emits a 201 Created with the URI for the new location
 func Created(c http.ResponseWriter, location string) {
 	c.Header().Set("Location", location)
 	http.Error(c, "201 Created", http.StatusCreated)
 }
 
+// Emits a 200 OK with a location. Used when after a PUT
 func Updated(c http.ResponseWriter, location string) {
 	c.Header().Set("Location", location)
 	http.Error(c, "200 OK", http.StatusOK)
 }
 
+// Emits a bad request with the specified instructions
 func BadRequest(c http.ResponseWriter, instructions string) {
 	c.WriteHeader(http.StatusBadRequest)
 	c.Write([]byte(instructions))
 }
 
+// Emits a 204 No Content
 func NoContent(c http.ResponseWriter) {
 	http.Error(c, "204 No Content", http.StatusNoContent)
 }

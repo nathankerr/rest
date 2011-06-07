@@ -13,7 +13,10 @@ type Client struct {
 	resource *http.URL
 }
 
-// resource is the url to the base of the resource (i.e., http://127.0.0.1:3000/snips/)
+// Creates a client for the specified resource.
+//
+// The resource is the url to the base of the resource (i.e.,
+// http://127.0.0.1:3000/snips/)
 func NewClient(resource string) (*Client, os.Error) {
 	var client = new(Client)
 	var err os.Error
@@ -33,7 +36,7 @@ func NewClient(resource string) (*Client, os.Error) {
 	return client, nil
 }
 
-// Close the clients connection
+// Closes the clients connection
 func (client *Client) Close() {
 	client.conn.Close()
 }
@@ -99,7 +102,6 @@ func (client *Client) Find(id string) (*http.Response, os.Error) {
 
 	return client.Request(request)
 }
-
 
 type nopCloser struct {
 	io.Reader

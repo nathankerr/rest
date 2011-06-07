@@ -1,7 +1,0 @@
-rest.go is an http based RESTful service engine and client.
-
-Install by running:
-
-goinstall github.com/nathankerr/rest.go
-
-Checkout examples/snips/snips.go for a simple server example

@@ -17,14 +17,14 @@ import (
 var formatting = "formatting instructions go here"
 
 // Get an index of the snips in the collection
-func (snips *SnipsCollection) Index(c http.ResponseWriter) {
+func (snips *SnipsCollection) Index(c http.ResponseWriter, r *http.Request) {
 	for _,snip := range snips.All() {
 		fmt.Fprintf(c, "<a href=\"%v\">%v</a>%v<br/>", snip.Id, snip.Id, snip.Body)
 	}
 }
 
 // Find a snip from the collection, identified by the ID
-func (snips *SnipsCollection) Find(c http.ResponseWriter, idString string) {
+func (snips *SnipsCollection) Find(c http.ResponseWriter, idString string, r *http.Request) {
 	id, err := strconv.Atoi(idString)
 	if err != nil {
 		rest.NotFound(c)
@@ -86,7 +86,7 @@ func (snips *SnipsCollection) Update(c http.ResponseWriter, idString string, req
 }
 
 // Delete a snip identified by ID from the collection
-func (snips *SnipsCollection) Delete(c http.ResponseWriter, idString string) {
+func (snips *SnipsCollection) Delete(c http.ResponseWriter, idString string, r *http.Request) {
 	var id int
 	var err os.Error
 	if id, err = strconv.Atoi(idString); err != nil {

@@ -6,11 +6,12 @@ import (
 	"io"
 	"net"
 	"os"
+	"url"
 )
 
 type Client struct {
 	conn     *http.ClientConn
-	resource *http.URL
+	resource *url.URL
 }
 
 // Creates a client for the specified resource.
@@ -22,7 +23,7 @@ func NewClient(resource string) (*Client, os.Error) {
 	var err os.Error
 
 	// setup host
-	if client.resource, err = http.ParseURL(resource); err != nil {
+	if client.resource, err = url.Parse(resource); err != nil {
 		return nil, err
 	}
 
@@ -53,8 +54,8 @@ func (client *Client) newRequest(method string, id string) (*http.Request, os.Er
 	request.Method = method
 
 	// Generate Resource-URI and parse it
-	url := client.resource.String() + id
-	if request.URL, err = http.ParseURL(url); err != nil {
+	uri := client.resource.String() + id
+	if request.URL, err = url.Parse(uri); err != nil {
 		return nil, err
 	}
 
@@ -140,9 +141,9 @@ func (client *Client) Update(id string, body string) (*http.Response, os.Error) 
 
 // Parse a response-Location-URI to get the ID of the worked-on snip
 func (client *Client) IdFromURL(urlString string) (string, os.Error) {
-	var url *http.URL
+	var url *url.URL
 	var err os.Error
-	if url, err = http.ParseURL(urlString); err != nil {
+	if url, err = url.Parse(urlString); err != nil {
 		return "", err
 	}
 

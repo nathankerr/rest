@@ -9,9 +9,7 @@ import (
 	"http"
 	"io/ioutil"
 	"os"
-	"github.com/nathankerr/rest.go"
-//	"github.com/jessta/rest.go"
-//	"github.com/Kissaki/rest.go"
+	"github.com/Swoogan/rest.go"
 	"strconv"
 )
 

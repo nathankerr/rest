@@ -2,7 +2,7 @@ A RESTful HTTP client and server.
 
 Install by running:
 
-	goinstall github.com/nathankerr/rest.go
+	goinstall github.com/Swoogan/rest.go
 
 Checkout examples/snips/snips.go for a simple client and server example
 

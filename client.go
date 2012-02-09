@@ -141,13 +141,13 @@ func (client *Client) Update(id string, body string) (*http.Response, os.Error) 
 
 // Parse a response-Location-URI to get the ID of the worked-on snip
 func (client *Client) IdFromURL(urlString string) (string, os.Error) {
-	var url *url.URL
+	var uri *url.URL
 	var err os.Error
-	if url, err = url.Parse(urlString); err != nil {
+	if uri, err = url.Parse(urlString); err != nil {
 		return "", err
 	}
 
-	return string(url.Path[len(client.resource.Path):]), nil
+	return string(uri.Path[len(client.resource.Path):]), nil
 }
 
 // DELETE /resource/id

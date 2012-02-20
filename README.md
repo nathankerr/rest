@@ -2,7 +2,7 @@ A RESTful HTTP client and server.
 
 Install by running:
 
-	goinstall github.com/nathankerr/rest.go
+	goinstall github.com/Swoogan/rest.go
 
 Checkout examples/snips/snips.go for a simple client and server example
 
@@ -16,13 +16,13 @@ and then use http as normal.
 A resource is an object that may have any of the following methods which
 respond to the specified HTTP requests:
 
-	GET /resource/ => Index(http.ResponseWriter)
-	GET /resource/id => Find(http.ResponseWriter, id string)
+	GET /resource/ => Index(http.ResponseWriter, *http.Request)
+	GET /resource/id => Find(http.ResponseWriter, id string, *http.Request)
 	POST /resource/ => Create(http.ResponseWriter, *http.Request)
 	PUT /resource/id => Update(http.ResponseWriter, id string, *http.Request)
-	DELETE /resource/id => Delete(http.ResponseWriter, id string)
-	OPTIONS /resource/ => Options(http.ResponseWriter, id string)
-	OPTIONS /resource/id => Options(http.ResponseWriter, id string)
+	DELETE /resource/id => Delete(http.ResponseWriter, id string, *http.Request)
+	OPTIONS /resource/ => Options(http.ResponseWriter, id string, *http.Request)
+	OPTIONS /resource/id => Options(http.ResponseWriter, id string, *http.Request)
 
 The server will then route HTTP requests to the appropriate method call.
 

@@ -11,7 +11,7 @@ var resources = make(map[string]interface{})
 // Lists all the items in the resource
 // GET /resource/
 type index interface {
-	Index(http.ResponseWriter)
+	Index(http.ResponseWriter, *http.Request)
 }
 
 // Creates a new resource item
@@ -23,7 +23,7 @@ type create interface {
 // Views a resource item
 // GET /resource/id
 type find interface {
-	Find(http.ResponseWriter, string)
+	Find(http.ResponseWriter, string, *http.Request)
 }
 
 // PUT /resource/id
@@ -33,14 +33,14 @@ type update interface {
 
 // DELETE /resource/id
 type delete interface {
-	Delete(http.ResponseWriter, string)
+	Delete(http.ResponseWriter, string, *http.Request)
 }
 
 // Return options to use the service. If string is nil, then it is the base URL
 // OPTIONS /resource/id
 // OPTIONS /resource/
 type options interface {
-	Options(http.ResponseWriter, string)
+	Options(http.ResponseWriter, string, *http.Request)
 }
 
 // Generic resource handler
@@ -65,7 +65,7 @@ func resourceHandler(c http.ResponseWriter, req *http.Request) {
 		case "GET":
 			// Index
 			if resIndex, ok := resource.(index); ok {
-				resIndex.Index(c)
+				resIndex.Index(c, req)
 			} else {
 				NotImplemented(c)
 			}
@@ -79,7 +79,7 @@ func resourceHandler(c http.ResponseWriter, req *http.Request) {
 		case "OPTIONS":
 			// automatic options listing
 			if resOptions, ok := resource.(options); ok {
-				resOptions.Options(c, id)
+				resOptions.Options(c, id, req)
 			} else {
 				NotImplemented(c)
 			}
@@ -91,7 +91,7 @@ func resourceHandler(c http.ResponseWriter, req *http.Request) {
 		case "GET":
 			// Find
 			if resFind, ok := resource.(find); ok {
-				resFind.Find(c, id)
+				resFind.Find(c, id, req)
 			} else {
 				NotImplemented(c)
 			}
@@ -105,14 +105,14 @@ func resourceHandler(c http.ResponseWriter, req *http.Request) {
 		case "DELETE":
 			// Delete
 			if resDelete, ok := resource.(delete); ok {
-				resDelete.Delete(c, id)
+				resDelete.Delete(c, id, req)
 			} else {
 				NotImplemented(c)
 			}
 		case "OPTIONS":
 			// automatic options
 			if resOptions, ok := resource.(options); ok {
-				resOptions.Options(c, id)
+				resOptions.Options(c, id, req)
 			} else {
 				NotImplemented(c)
 			}

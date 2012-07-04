@@ -24,4 +24,3 @@ The server will then route HTTP requests to the appropriate method call.
 The snips example provides a full example of both a client and server.
 */
 package rest
-

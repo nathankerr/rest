@@ -2,7 +2,7 @@ A RESTful HTTP client and server.
 
 Install by running:
 
-	goinstall github.com/Swoogan/rest.go
+	go get github.com/nathankerr/rest.go
 
 Checkout examples/snips/snips.go for a simple client and server example
 
@@ -27,4 +27,3 @@ respond to the specified HTTP requests:
 The server will then route HTTP requests to the appropriate method call.
 
 The snips example provides a full example of both a client and server.
-

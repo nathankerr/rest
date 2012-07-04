@@ -1,5 +1,7 @@
 A RESTful HTTP client and server.
 
+Currently [![](http://goci.me/project/image/github.com/nathankerr/rest)](http://goci.me/project/image/github.com/nathankerr/rest)
+
 Install by running:
 
 	go get github.com/nathankerr/rest

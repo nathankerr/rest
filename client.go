@@ -2,15 +2,15 @@ package rest
 
 import (
 	"bytes"
-	"http"
 	"io"
 	"net"
-	"os"
-	"url"
+	"net/http"
+	"net/http/httputil"
+	"net/url"
 )
 
 type Client struct {
-	conn     *http.ClientConn
+	conn     *httputil.ClientConn
 	resource *url.URL
 }
 
@@ -18,9 +18,9 @@ type Client struct {
 //
 // The resource is the url to the base of the resource (i.e.,
 // http://127.0.0.1:3000/snips/)
-func NewClient(resource string) (*Client, os.Error) {
+func NewClient(resource string) (*Client, error) {
 	var client = new(Client)
-	var err os.Error
+	var err error
 
 	// setup host
 	if client.resource, err = url.Parse(resource); err != nil {
@@ -32,7 +32,7 @@ func NewClient(resource string) (*Client, os.Error) {
 	if tcpConn, err = net.Dial("tcp", client.resource.Host); err != nil {
 		return nil, err
 	}
-	client.conn = http.NewClientConn(tcpConn, nil)
+	client.conn = httputil.NewClientConn(tcpConn, nil)
 
 	return client, nil
 }
@@ -43,9 +43,9 @@ func (client *Client) Close() {
 }
 
 // General Request method used by the specialized request methods to create a request
-func (client *Client) newRequest(method string, id string) (*http.Request, os.Error) {
+func (client *Client) newRequest(method string, id string) (*http.Request, error) {
 	request := new(http.Request)
-	var err os.Error
+	var err error
 
 	request.ProtoMajor = 1
 	request.ProtoMinor = 1
@@ -63,8 +63,8 @@ func (client *Client) newRequest(method string, id string) (*http.Request, os.Er
 }
 
 // Send a request
-func (client *Client) Request(request *http.Request) (*http.Response, os.Error) {
-	var err os.Error
+func (client *Client) Request(request *http.Request) (*http.Response, error) {
+	var err error
 	var response *http.Response
 
 	// Send the request
@@ -81,9 +81,9 @@ func (client *Client) Request(request *http.Request) (*http.Response, os.Error) 
 }
 
 // GET /resource/
-func (client *Client) Index() (*http.Response, os.Error) {
+func (client *Client) Index() (*http.Response, error) {
 	var request *http.Request
-	var err os.Error
+	var err error
 
 	if request, err = client.newRequest("GET", ""); err != nil {
 		return nil, err
@@ -93,9 +93,9 @@ func (client *Client) Index() (*http.Response, os.Error) {
 }
 
 // GET /resource/id
-func (client *Client) Find(id string) (*http.Response, os.Error) {
+func (client *Client) Find(id string) (*http.Response, error) {
 	var request *http.Request
-	var err os.Error
+	var err error
 
 	if request, err = client.newRequest("GET", id); err != nil {
 		return nil, err
@@ -108,14 +108,14 @@ type nopCloser struct {
 	io.Reader
 }
 
-func (nopCloser) Close() os.Error {
+func (nopCloser) Close() error {
 	return nil
 }
 
 // POST /resource
-func (client *Client) Create(body string) (*http.Response, os.Error) {
+func (client *Client) Create(body string) (*http.Response, error) {
 	var request *http.Request
-	var err os.Error
+	var err error
 
 	if request, err = client.newRequest("POST", ""); err != nil {
 		return nil, err
@@ -127,9 +127,9 @@ func (client *Client) Create(body string) (*http.Response, os.Error) {
 }
 
 // PUT /resource/id
-func (client *Client) Update(id string, body string) (*http.Response, os.Error) {
+func (client *Client) Update(id string, body string) (*http.Response, error) {
 	var request *http.Request
-	var err os.Error
+	var err error
 	if request, err = client.newRequest("PUT", id); err != nil {
 		return nil, err
 	}
@@ -140,9 +140,9 @@ func (client *Client) Update(id string, body string) (*http.Response, os.Error) 
 }
 
 // Parse a response-Location-URI to get the ID of the worked-on snip
-func (client *Client) IdFromURL(urlString string) (string, os.Error) {
+func (client *Client) IdFromURL(urlString string) (string, error) {
 	var uri *url.URL
-	var err os.Error
+	var err error
 	if uri, err = url.Parse(urlString); err != nil {
 		return "", err
 	}
@@ -151,9 +151,9 @@ func (client *Client) IdFromURL(urlString string) (string, os.Error) {
 }
 
 // DELETE /resource/id
-func (client *Client) Delete(id string) (*http.Response, os.Error) {
+func (client *Client) Delete(id string) (*http.Response, error) {
 	var request *http.Request
-	var err os.Error
+	var err error
 	if request, err = client.newRequest("DELETE", id); err != nil {
 		return nil, err
 	}

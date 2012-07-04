@@ -4,11 +4,10 @@ package main
 import (
 	"flag"
 	"fmt"
-	"http"
+	"github.com/nathankerr/rest.go"
 	"io/ioutil"
 	"log"
-	"os"
-	"github.com/Swoogan/rest.go"
+	"net/http"
 )
 
 var server = flag.Bool("server", false, "start in server mode")
@@ -41,7 +40,7 @@ func serve() {
 func client() {
 	log.Println("Starting Client")
 	var snips *rest.Client
-	var err os.Error
+	var err error
 
 	if snips, err = rest.NewClient("http://127.0.0.1:3000/snips/"); err != nil {
 		log.Fatalln(err)

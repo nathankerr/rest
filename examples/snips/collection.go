@@ -7,7 +7,6 @@ package main
 
 import (
 	"log"
-	"container/vector"
 )
 
 // Snip definintion
@@ -23,59 +22,46 @@ func NewSnip(id int, body string) *Snip {
 
 // SnipsCollection definition
 type SnipsCollection struct {
-	v *vector.Vector
+	snips map[int]string
 	nextId int
 }
 
 func NewSnipsCollection() (*SnipsCollection) {
 	log.Println("Creating new SnipsCollection")
-	return &SnipsCollection{new(vector.Vector), 0}
+	return &SnipsCollection{make(map[int]string), 0}
 }
 
-func (snips *SnipsCollection) Add(body string) int {
+func (c *SnipsCollection) Add(body string) int {
 	log.Println("Adding Snip:", body)
-	id := snips.nextId
-	snips.nextId++
+	id := c.nextId
+	c.nextId++
 
-	snip := NewSnip(id, body)
-	snips.v.Push(snip)
+	c.snips[id] = body
 
 	return id
 }
 
-func (snips *SnipsCollection) WithId(id int) (*Snip, bool) {
+func (c *SnipsCollection) WithId(id int) (*Snip, bool) {
 	log.Println("Finding Snip with id: ", id)
-	all := *snips.v
-	for _, v := range all {
-		snip, ok := v.(*Snip)
-		if ok && snip.Id == id {
-			return snip, true
-		}
+	body, ok := c.snips[id]
+	if !ok {
+		return nil, false
 	}
-	return nil, false
+
+	return &Snip{id, body}, true
 }
 
-func (snips *SnipsCollection) All() []*Snip {
+func (c *SnipsCollection) All() []*Snip {
 	log.Println("Finding all Snips")
-	data := *snips.v
-	all := make([]*Snip, len(data))
+	all := make([]*Snip, len(c.snips))
 
-	for k, v := range data {
-		if snip, ok := v.(*Snip); ok {
-			all[k] = snip
-		}
+	for id, body := range c.snips {
+		all[id] = &Snip{id, body}
 	}
 
 	return all
 }
 
-func (snips *SnipsCollection) Remove(id int) {
-	length := snips.v.Len()
-	for i := 0; i < length; i++ {
-		snip := snips.v.At(i).(*Snip)
-		if snip.Id == id {
-			snips.v.Delete(i)
-			return
-		}
-	}
+func (c *SnipsCollection) Remove(id int) {
+	delete(c.snips, id)
 }

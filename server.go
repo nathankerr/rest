@@ -2,7 +2,7 @@ package rest
 
 import (
 	"fmt"
-	"http"
+	"net/http"
 	"strings"
 )
 

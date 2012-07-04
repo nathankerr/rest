@@ -1,6 +1,8 @@
 A RESTful HTTP client and server.
 
-Currently [![](http://goci.me/project/image/github.com/nathankerr/rest)](http://goci.me/project/image/github.com/nathankerr/rest)
+goci: [![](http://goci.me/project/image/github.com/nathankerr/rest)](http://goci.me/project/github.com/nathankerr/rest)
+
+docs: http://go.pkgdoc.org/github.com/nathankerr/rest
 
 Install by running:
 

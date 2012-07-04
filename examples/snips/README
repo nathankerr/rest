@@ -1,4 +1,4 @@
-A simple rest.go server and client.
+A simple server and client.
 
 Compile with
 $ gomake
@@ -9,6 +9,6 @@ $ ./snips -server
 Run client with
 $ ./snips
 
-You can also access the server with other tools or your webbrowser (which will allos you to at least Index and Find(Id) by GET requests).
+You can also access the server with other tools or your webbrowser (which will allows you to at least Index and Find(Id) by GET requests).
 Open http://127.0.0.1:3000/snips/ in your browser.
 

@@ -1,7 +1,7 @@
 /*
 A RESTful HTTP client and server.
 
-rest.go uses the standard http package by adding resource routes. Add
+rest uses the standard http package by adding resource routes. Add
 a new route by:
 
 	rest.Resource("resourcepath", resourcevariable)

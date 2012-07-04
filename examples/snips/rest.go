@@ -6,7 +6,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/nathankerr/rest.go"
+	"github.com/nathankerr/rest"
 	"io/ioutil"
 	"net/http"
 	"strconv"

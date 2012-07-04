@@ -2,11 +2,11 @@ A RESTful HTTP client and server.
 
 Install by running:
 
-	go get github.com/nathankerr/rest.go
+	go get github.com/nathankerr/rest
 
 Checkout examples/snips/snips.go for a simple client and server example
 
-rest.go uses the standard http package by adding resource routes. Add
+rest uses the standard http package by adding resource routes. Add
 a new route by:
 
 	rest.Resource("resourcepath", resourcevariable)
